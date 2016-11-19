@@ -1,0 +1,17 @@
+
+create table login(
+id varchar(20),
+pw varchar(20),
+primary key(id)
+);
+
+create table ranking(
+id varchar(20),
+score int,
+primary key(id),
+foreign key(id) references login(id)
+);
+
+테이블이 비어있으면 안댐ㅜㅜ
+insert into login values('default','000');
+insert into login values('deralut',0);
