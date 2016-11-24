@@ -70,7 +70,7 @@ public class Database {
 				pstmt = con.prepareStatement(sql2);
 				rs = pstmt.executeQuery(sql2); 
 				rs.next();
-				if(score>=rs.getInt("score")){
+				if(score!=rs.getInt("score")){
 					System.out.println("회원 랭킹갱신");
 				}
 			}

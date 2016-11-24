@@ -15,7 +15,8 @@ import java.util.Vector;
 
 public class Card {
 	Vector<Integer> card;
-	int cardValue;
+	public int cardValue;
+	
 	public Card(){
 		card = new Vector<>(); //객체 생성
 		for(int i = 0; i<10; i++) //1~10까지로 초기화
