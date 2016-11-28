@@ -108,11 +108,11 @@ public class IPServer extends AbstractServer {
 				cli.get(0)
 						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
 								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn); // 메세지와 상대방 카드번호, 턴수 보냄
+								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn +"@"+"player1"); // 메세지와 상대방 카드번호, 턴수, 현재차례 보냄
 				cli.get(1)
 						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
 								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn); // 메세지와 상대방 카드번호, 턴수 보냄
+								+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn +"@"+"player1"); // 메세지와 상대방 카드번호, 턴수, 현재차례 보냄
 				System.out.println("게임을 시작합니다.");
 			} catch (Exception e) {
 				System.out.println("예기치 못한 오류가 발생되었습니다." + e);
@@ -259,16 +259,19 @@ public class IPServer extends AbstractServer {
 				}
 			}
 		}
-
+		String nowTurn = "";
+		
 		// 베팅 점수에 오류가 없다면
 		switch (pnum) {
 		case 1:
 			IndianPoker.getInstance().p1.betPoint = ckBet;
 			IndianPoker.getInstance().p1.point -= ckBet;
+			nowTurn = "player2";
 			break;
 		case 2:
 			IndianPoker.getInstance().p2.betPoint = ckBet;
 			IndianPoker.getInstance().p2.point -= ckBet;
+			nowTurn = "player1";
 			break;
 		default:
 			break;
@@ -276,10 +279,10 @@ public class IPServer extends AbstractServer {
 		IndianPoker.getInstance().currentBP += ckBet;
 
 		try {
-			cli.get(0).sendToClient(
-					"msg:bet" + IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p1.point); // 현재 베팅점수, 내점수
-			cli.get(1).sendToClient(
-					"msg:bet" + IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p2.point); // 현재 베팅점수, 내점수
+			cli.get(0).sendToClient("msg:bet" 
+		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p1.point +"@"+nowTurn); // 현재 베팅점수, 내점수, 현재차례 보냄
+			cli.get(1).sendToClient("msg:bet" 
+		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p2.point +"@"+nowTurn); // 현재 베팅점수, 내점수, 현재차례 보냄
 		} catch (IOException e) {
 		}
 
