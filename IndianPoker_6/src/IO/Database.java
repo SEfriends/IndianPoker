@@ -41,7 +41,7 @@ public class Database {
 				System.out.println("랭킹이 존재하지 않습니다.");
 			else{
 				while (rs.next()) {
-					ranking += ("id:" + rs.getString("id") + " score:" + Integer.toString(rs.getInt("score"))
+					ranking += ("id:" + rs.getString("id") + "!score:" + Integer.toString(rs.getInt("score"))
 					+ "\n");
 				}
 			}

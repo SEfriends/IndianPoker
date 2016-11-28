@@ -147,7 +147,7 @@ public class IPServer extends AbstractServer {
 
 		for (int i = 0; i < s1.length; i++) {
 			s2 = s1[i].split("@");
-			for (int j = 0; j < 3; j++) {
+			for (int j = 0; j < 2; j++) {
 				userList[i][j] = new String();
 				userList[i][j] = s2[j];
 			}
