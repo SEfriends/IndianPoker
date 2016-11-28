@@ -12,11 +12,9 @@ public class IPServer extends AbstractServer {
 	String[][] userList;
 	public IPServer(int port) {
 		super(port);
-		// TODO Auto-generated constructor stub
 	}
 
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
-		// TODO Auto-generated method stub
 		String m = msg.toString();
 		switch (m) {
 		case "Play":
@@ -69,7 +67,6 @@ public class IPServer extends AbstractServer {
 				try {
 					client.sendToClient("올바른 명령어가 아닙니다." + msg);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			break;
@@ -114,21 +111,20 @@ public class IPServer extends AbstractServer {
 		return id;
 	}
 	
-	void play(String m, ConnectionToClient client){
+	void play(String m, ConnectionToClient client){ //게임 시작 버튼을 눌렀을때 실행되는 메소드
 		System.out.println("Client로부터  play 요청을 받았습니다." + client);
 		if(cli.size()%2 == 1){
 			System.out.println("인원이 부족하여 게임을 시작할 수 없습니다. 다른 클라이언트 접속을 기다립니다...");
 			try {
 				client.sendToClient("msg:wait"+"다른 플레이어가 접속할 때 까지 기다려야합니다...");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
 			try {
 				IndianPoker.getInstance().p1.card.selectCard(); //카드 랜덤 선택
 				IndianPoker.getInstance().p2.card.selectCard(); //카드 랜덤 선택
-				
+								
 				cli.get(0).sendToClient("msg:play"+"Player1("+IndianPoker.getInstance().p1.name+")과"+
 						"Player2("+IndianPoker.getInstance().p2.name+")의 게임을 시작합니다."
 						+"@"+IndianPoker.getInstance().p2.card.cardValue+"@"+turn);	//메세지와 상대방 카드번호, 턴수 보냄	
@@ -143,7 +139,7 @@ public class IPServer extends AbstractServer {
 		}
 	}
 
-	void rank(String m, ConnectionToClient client){
+	void rank(String m, ConnectionToClient client){ //랭킹 보기 요청을 받았을 때
 		System.out.println(findClient(client)+"님으로부터 Rank보기 요청을 받았습니다." + client);
 		try {
 			String rk = IndianPoker.getInstance().db.Ranking();
@@ -153,7 +149,7 @@ public class IPServer extends AbstractServer {
 		}
 	}
 
-	void login(String m, ConnectionToClient client){
+	void login(String m, ConnectionToClient client){ //
 		String id = "";
 		String pwd = "";
 		
@@ -196,7 +192,6 @@ public class IPServer extends AbstractServer {
 				try {
 					client.sendToClient("msg:LoginSuccess");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -206,7 +201,6 @@ public class IPServer extends AbstractServer {
 					client.sendToClient("msg:quit잘못된 비밀번호입니다. 다시 로그인하세요.");
 					client.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -216,7 +210,6 @@ public class IPServer extends AbstractServer {
 				client.sendToClient("msg:quit등록된 사용자가 아닙니다. 다시 로그인하세요.");
 				client.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -237,7 +230,6 @@ public class IPServer extends AbstractServer {
 		try {
 			client.sendToClient("msg:LoginSuccess");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -253,7 +245,6 @@ public class IPServer extends AbstractServer {
 					System.out.println(findClient(client)+"의 베팅 점수 오류가 발생하였습니다."+client);
 					return;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 				}
 			}
 			if(ckBet < IndianPoker.getInstance().p2.betPoint){
@@ -262,7 +253,6 @@ public class IPServer extends AbstractServer {
 					System.out.println(findClient(client)+"의 베팅 점수가 상대방 점수보다 작습니다."+client);
 					return;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 				}
 			}
 		}
@@ -274,7 +264,6 @@ public class IPServer extends AbstractServer {
 					System.out.println(findClient(client)+"의 베팅 점수 오류가 발생하였습니다."+client);
 					return;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 				}
 			}
 			if(ckBet < IndianPoker.getInstance().p1.betPoint){
@@ -283,7 +272,6 @@ public class IPServer extends AbstractServer {
 					System.out.println(findClient(client)+"의 베팅 점수가 상대방 점수보다 작습니다."+client);
 					return;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 				}
 			}
 		}
@@ -292,30 +280,26 @@ public class IPServer extends AbstractServer {
 		case 1:
 			IndianPoker.getInstance().p1.betPoint = ckBet;
 			IndianPoker.getInstance().p1.point -= ckBet;
-			IndianPoker.getInstance().p1.setBet = true;
 			break;
 		case 2:
 			IndianPoker.getInstance().p2.betPoint = ckBet;
 			IndianPoker.getInstance().p2.point -= ckBet;
-			IndianPoker.getInstance().p1.setBet = true;
 			break;
 			default:
 				break;
 		}
 		IndianPoker.getInstance().currentBP += ckBet;
 		
-		if(IndianPoker.getInstance().p1.setBet && IndianPoker.getInstance().p2.setBet){
-			if(IndianPoker.getInstance().p1.betPoint == IndianPoker.getInstance().p2.betPoint){
-				nextTurn();
-			}
+		if(IndianPoker.getInstance().p1.betPoint == IndianPoker.getInstance().p2.betPoint){ // player1과 player2의 베팅포인트가 같을 경우
+			nextTurn();
 		}
+
 		try {
 			cli.get(0).sendToClient("msg:bet" + IndianPoker.getInstance().currentBP
 					+"@"+IndianPoker.getInstance().p1.point); //현재 베팅점수, 내점수
 			cli.get(1).sendToClient("msg:bet" + IndianPoker.getInstance().currentBP
 					+"@"+IndianPoker.getInstance().p2.point); //현재 베팅점수, 내점수
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 		}
 		
 	}
@@ -323,10 +307,9 @@ public class IPServer extends AbstractServer {
 	void giveup(String m, ConnectionToClient client){
 		// 포기버튼을 눌렀을 때
 		// 턴이 종료되므로 초기화
-		IndianPoker.getInstance().p1.setBet = false;
-		IndianPoker.getInstance().p2.setBet = false;
 		IndianPoker.getInstance().p1.betPoint = 0;
 		IndianPoker.getInstance().p2.betPoint = 0;
+		
 		
 		if(cli.get(0).equals(client)){ //player 1이 포기한 경우
 			if(IndianPoker.getInstance().p1.card.cardValue == 10){
@@ -340,7 +323,6 @@ public class IPServer extends AbstractServer {
 				cli.get(0).sendToClient("msg:win" + "턴 패배!");
 				cli.get(1).sendToClient("msg:win" + "턴 승리!");
 			}catch (IOException e) {
-				// TODO Auto-generated catch block
 			}
 		}
 		if(cli.get(1).equals(client)){ //player 2가 포기한 경우
@@ -356,8 +338,8 @@ public class IPServer extends AbstractServer {
 				cli.get(0).sendToClient("msg:win" + "턴 승리!");
 				cli.get(1).sendToClient("msg:win" + "턴 패배!");
 			}catch (IOException e) {
-				// TODO Auto-generated catch block
 			}
+			turn++; //턴 종료
 		}
 		
 		
@@ -367,8 +349,6 @@ public class IPServer extends AbstractServer {
 	void nextTurn() { //두사람의 베팅포인트가 같을 때 실행되는 메소드, 턴 종료
 		int result = IndianPoker.getInstance().compare();
 		//턴이 종료됐으므로 초기화
-		IndianPoker.getInstance().p1.setBet = false;
-		IndianPoker.getInstance().p2.setBet = false;
 		IndianPoker.getInstance().p1.betPoint = 0;
 		IndianPoker.getInstance().p2.betPoint = 0;
 		
@@ -399,39 +379,58 @@ public class IPServer extends AbstractServer {
 				break;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 		}
 	}
 	
-	boolean isGameOver(int turn){
+	boolean isGameOver(){
 		if(turn == 11)		return true;
 		if(IndianPoker.getInstance().p1.point == 0 || IndianPoker.getInstance().p2.point == 0){
 			return true;
 		}
-			
 		return false;
 	}
 	
-	void gameOver(int turn){
+	void gameOver(){
 		int score1 = IndianPoker.getInstance().p1.win*10 + IndianPoker.getInstance().p1.point;
 		int score2 = IndianPoker.getInstance().p2.win*10 + IndianPoker.getInstance().p2.point;
 		if(turn == 11){
 			System.out.println("턴이 모두 종료되었으므로 게임을 종료합니다.");
 			
 			if(score1 > score2){ //player1의 최종승리!
-				
+				IndianPoker.getInstance().p1.score += 100;
+				IndianPoker.getInstance().db.UpdateScore(IndianPoker.getInstance().p1.name
+						, IndianPoker.getInstance().p1.score);
 			}
 			else if(score1 < score2){ //player2의 최종승리!
-				
+				IndianPoker.getInstance().p2.score += 100;
+				IndianPoker.getInstance().db.UpdateScore(IndianPoker.getInstance().p2.name
+						, IndianPoker.getInstance().p2.score);
 			}else{ //무승부
-				
+				IndianPoker.getInstance().p1.score += 50;
+				IndianPoker.getInstance().p2.score += 50;
+				IndianPoker.getInstance().db.UpdateScore(IndianPoker.getInstance().p1.name
+						, IndianPoker.getInstance().p1.score);
+				IndianPoker.getInstance().db.UpdateScore(IndianPoker.getInstance().p2.name
+						, IndianPoker.getInstance().p2.score);
 			}
 			try{
 				cli.get(0).sendToClient("msg:finish" + "");
 				cli.get(1).sendToClient("msg:finish" + "");
 			}catch (IOException e) {
-				// TODO Auto-generated catch block
 			}
 		}
+		if(IndianPoker.getInstance().p1.point ==0){
+			
+		}
+		
 	}
+	int turnOver(){
+		turn++;
+		
+		IndianPoker.getInstance().p1.card.selectCard();
+		IndianPoker.getInstance().p2.card.selectCard();
+		
+		return 0;
+	}
+	
 }
