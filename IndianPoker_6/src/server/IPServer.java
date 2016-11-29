@@ -129,7 +129,8 @@ public class IPServer extends AbstractServer {
 	void rank(String m, ConnectionToClient client) { // 랭킹 보기 요청을 받았을 때
 		System.out.println(findClient(client) + "님으로부터 Rank보기 요청을 받았습니다." + client);
 		try {
-			String rk = IndianPoker.getInstance().db.Ranking();
+			String rk = "";
+			rk = IndianPoker.getInstance().db.Ranking();
 			client.sendToClient("msg:rank" + rk);
 		} catch (Exception e) {
 			System.out.println("예기치 못한 오류가 발생되었습니다. " + e);
