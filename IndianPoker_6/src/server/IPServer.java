@@ -42,6 +42,8 @@ public class IPServer extends AbstractServer {
 				newID(m, client);
 			} else if (m.startsWith("betting")) {
 				betting(m, client);
+			} else if (m.startsWith("giveUp")){
+				giveup(m, client);
 			} else {
 				try {
 					client.sendToClient("올바른 명령어가 아닙니다." + msg);
@@ -108,11 +110,15 @@ public class IPServer extends AbstractServer {
 				cli.get(0)
 						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
 								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn +"@"+"player1"); // 메세지와 상대방 카드번호, 턴수, 현재차례 보냄
+								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn 
+								+ "@"+IndianPoker.getInstance().p1.name
+								+ "@"+ IndianPoker.getInstance().p1.card.cardValue);// 메세지와 상대방 카드번호, 턴수, 현재차례, player1이름, 자신의 카드번호 보냄
 				cli.get(1)
 						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
 								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn +"@"+"player1"); // 메세지와 상대방 카드번호, 턴수, 현재차례 보냄
+								+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn +"@"+"player1"
+								+ "@"+IndianPoker.getInstance().p1.name
+								+ "@"+ IndianPoker.getInstance().p2.card.cardValue); // 메세지와 상대방 카드번호, 턴수, 현재차례, player1이름, 자신의 카드번호 보냄
 				System.out.println("게임을 시작합니다.");
 			} catch (Exception e) {
 				System.out.println("예기치 못한 오류가 발생되었습니다." + e);
@@ -280,9 +286,11 @@ public class IPServer extends AbstractServer {
 
 		try {
 			cli.get(0).sendToClient("msg:bet" 
-		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p1.point +"@"+nowTurn); // 현재 베팅점수, 내점수, 현재차례 보냄
+		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p1.point +"@"+nowTurn
+		+"@" + IndianPoker.getInstance().p2.point); // 현재 베팅점수, 내점수, 현재차례, 상대방점수 보냄
 			cli.get(1).sendToClient("msg:bet" 
-		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p2.point +"@"+nowTurn); // 현재 베팅점수, 내점수, 현재차례 보냄
+		+ IndianPoker.getInstance().currentBP + "@" + IndianPoker.getInstance().p2.point +"@"+nowTurn
+		+"@" + IndianPoker.getInstance().p1.point); // 현재 베팅점수, 내점수, 현재차례, 상대방점수 보냄
 		} catch (IOException e) {
 		}
 
@@ -302,7 +310,9 @@ public class IPServer extends AbstractServer {
 					IndianPoker.getInstance().p1.point = 0; // 차감했는데 점수가 -값인 경우 underflow로 0점처리
 			}
 			IndianPoker.getInstance().p2.win++; // 상대방의 승리
-
+			IndianPoker.getInstance().p2.point += IndianPoker.getInstance().currentBP; //점수+
+			IndianPoker.getInstance().currentBP = 0;
+			
 			try {
 				cli.get(0).sendToClient("msg:win" + "턴 패배!");
 				cli.get(1).sendToClient("msg:win" + "턴 승리!");
@@ -314,9 +324,13 @@ public class IPServer extends AbstractServer {
 			}
 			try {
 				cli.get(0).sendToClient("msg:turn" 
-			+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
+			+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn
+			+ "@" +IndianPoker.getInstance().p1.point + "@" +IndianPoker.getInstance().p2.point
+			+ "@" +IndianPoker.getInstance().p1.card.cardValue); // 상대방 카드번호,턴수, 상대방 점수, 나의카드번호  보냄
 				cli.get(1).sendToClient("msg:turn" 
-			+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
+			+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn
+			+ "@" +IndianPoker.getInstance().p2.point + "@" +IndianPoker.getInstance().p1.point
+			+ "@" +IndianPoker.getInstance().p2.card.cardValue); // 상대방 카드번호,턴수 상대방점수, 나의카드번호  보냄
 			} catch (IOException e) {
 			}
 		}
@@ -329,6 +343,8 @@ public class IPServer extends AbstractServer {
 					IndianPoker.getInstance().p2.point = 0;// 차감했는데 점수가 -값인 경우 underflow로 0점처리
 			}
 			IndianPoker.getInstance().p1.win++; // 상대방의 승리
+			IndianPoker.getInstance().p1.point += IndianPoker.getInstance().currentBP; //점수+
+			IndianPoker.getInstance().currentBP = 0;
 
 			try {
 				cli.get(0).sendToClient("msg:win" + "턴 승리!");
@@ -342,9 +358,13 @@ public class IPServer extends AbstractServer {
 
 			try {
 				cli.get(0).sendToClient("msg:turn" 
-			+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
+						+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn
+						+ "@" +IndianPoker.getInstance().p1.point + "@" +IndianPoker.getInstance().p2.point
+						+ "@" +IndianPoker.getInstance().p1.card.cardValue); // 상대방 카드번호,턴수, 상대방 점수, 나의카드번호  보냄
 				cli.get(1).sendToClient("msg:turn" 
-			+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
+						+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn
+						+ "@" +IndianPoker.getInstance().p2.point + "@" +IndianPoker.getInstance().p1.point
+						+ "@" +IndianPoker.getInstance().p2.card.cardValue); // 상대방 카드번호,턴수 상대방점수, 나의카드번호  보냄
 			} catch (IOException e) {
 			}
 		}
@@ -373,10 +393,14 @@ public class IPServer extends AbstractServer {
 				return; // 아예 게임 종료
 			}
 			cli.get(0).sendToClient("msg:turn" 
-					+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
+					+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn
+					+ "@" +IndianPoker.getInstance().p1.point + "@" +IndianPoker.getInstance().p2.point
+					+ "@" +IndianPoker.getInstance().p1.card.cardValue); // 상대방 카드번호,턴수, 상대방 점수, 나의카드번호  보냄
 			cli.get(1).sendToClient("msg:turn" 
-					+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn); // 상대방 카드번호,턴수  보냄
-		} catch (IOException e) {
+					+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn
+					+ "@" +IndianPoker.getInstance().p2.point + "@" +IndianPoker.getInstance().p1.point
+					+ "@" +IndianPoker.getInstance().p2.card.cardValue); // 상대방 카드번호,턴수 상대방점수, 나의카드번호  보냄		
+			} catch (IOException e) {
 		}
 	}
 
@@ -467,5 +491,4 @@ public class IPServer extends AbstractServer {
 			}
 		}
 	}
-
 }
