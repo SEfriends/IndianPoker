@@ -6,8 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Database {
-	String s = "";//회원출력스트링
-	String ranking ="";//랭킹출력스트링
 	String driver="org.mariadb.jdbc.Driver"; 
 	String url = "jdbc:mariadb://localhost:3307/IndianPoker";
 	Connection con = null;
@@ -32,7 +30,9 @@ public class Database {
 	public String Ranking(){
 		init();
 		int rowNum;
+		String ranking ="";//랭킹출력스트링
 		try{
+			
 			String sql = "select id, score from member order by score desc";
 			pstmt = con.prepareStatement(sql);
 			rs = pstmt.executeQuery(sql);    //sql문으로 리턴한 값
@@ -89,6 +89,7 @@ public class Database {
 	}
 
 	public String getList() {
+		String s = "";//회원출력스트링
 		init();
 		try {
 			String sql = "select * from member";
