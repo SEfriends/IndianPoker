@@ -7,6 +7,7 @@ import Model.IndianPoker;
 import Model.Player;
 
 public class IPServer extends AbstractServer {
+	int playcnt = 0;
 	int turn = 1;
 	Vector<ConnectionToClient> cli = new Vector<>(); // 접속한 클라이언트들
 	String[][] userList;
@@ -95,33 +96,39 @@ public class IPServer extends AbstractServer {
 
 	void play(String m, ConnectionToClient client) { // 게임 시작 버튼을 눌렀을때 실행되는 메소드
 		System.out.println("Client로부터  play 요청을 받았습니다." + client);
+		System.out.println(cli.size()+"");
+		System.out.println(cli.get(0));
+		playcnt++;
 		if (cli.size() % 2 == 1) {
 			System.out.println("인원이 부족하여 게임을 시작할 수 없습니다. 다른 클라이언트 접속을 기다립니다...");
+			System.out.println(cli.get(0));
 			try {
 				client.sendToClient("msg:wait" + "다른 플레이어가 접속할 때 까지 기다려야합니다...");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
+		} else if(playcnt%2==0){
 			try {
 				IndianPoker.getInstance().p1.card.selectCard(); // 카드 랜덤 선택
 				IndianPoker.getInstance().p2.card.selectCard(); // 카드 랜덤 선택
-
+				
 				cli.get(0)
-						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
+						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과 " + "Player2("
 								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn 
+								+ IndianPoker.getInstance().p2.card.cardValue + "@" + turn +"@"+"player1"
 								+ "@"+IndianPoker.getInstance().p1.name
 								+ "@"+ IndianPoker.getInstance().p1.card.cardValue);// 메세지와 상대방 카드번호, 턴수, 현재차례, player1이름, 자신의 카드번호 보냄
 				cli.get(1)
-						.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과" + "Player2("
-								+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
-								+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn +"@"+"player1"
-								+ "@"+IndianPoker.getInstance().p1.name
-								+ "@"+ IndianPoker.getInstance().p2.card.cardValue); // 메세지와 상대방 카드번호, 턴수, 현재차례, player1이름, 자신의 카드번호 보냄
+				.sendToClient("msg:play" + "Player1(" + IndianPoker.getInstance().p1.name + ")과 " + "Player2("
+						+ IndianPoker.getInstance().p2.name + ")의 게임을 시작합니다." + "@"
+						+ IndianPoker.getInstance().p1.card.cardValue + "@" + turn +"@"+"player1"
+						+ "@"+IndianPoker.getInstance().p1.name
+						+ "@"+ IndianPoker.getInstance().p2.card.cardValue); // 메세지와 상대방 카드번호, 턴수, 현재차례, player1이름, 자신의 카드번호 보냄
+			
+				
 				System.out.println("게임을 시작합니다.");
 			} catch (Exception e) {
-				System.out.println("예기치 못한 오류가 발생되었습니다." + e);
+				System.out.println("11예기치 못한 오류가 발생되었습니다." + e);
 			}
 		}
 	}
@@ -149,12 +156,12 @@ public class IPServer extends AbstractServer {
 
 		System.out.println("Client로부터 login 요청을 받았습니다." + client);
 		String[] s1 = IndianPoker.getInstance().db.getList().split("!");
-		userList = new String[s1.length][2]; // 0:id, 1:pwd
+		userList = new String[s1.length][3]; // 0:id, 1:pwd 2:score
 		String[] s2 = null;
-
+		int sc = 0;
 		for (int i = 0; i < s1.length; i++) {
 			s2 = s1[i].split("@");
-			for (int j = 0; j < 2; j++) {
+			for (int j = 0; j < 3; j++) {
 				userList[i][j] = new String();
 				userList[i][j] = s2[j];
 			}
@@ -164,6 +171,7 @@ public class IPServer extends AbstractServer {
 				hasid = true;
 				if (userList[i][1].equals(pwd)) { // 패스워드 일치
 					ispwd = true;
+					sc = Integer.parseInt(userList[i][2]);
 				}
 			}
 		}
@@ -171,9 +179,9 @@ public class IPServer extends AbstractServer {
 		if (hasid) {
 			if (ispwd) {
 				if (cli.size() % 2 == 1) {
-					IndianPoker.getInstance().p1 = new Player(id, Integer.parseInt(s2[2]));
+					IndianPoker.getInstance().p1 = new Player(id, sc);
 				} else {
-					IndianPoker.getInstance().p2 = new Player(id, Integer.parseInt(s2[2]));
+					IndianPoker.getInstance().p2 = new Player(id, sc);
 				}
 				System.out.println(findClient(client) + "님이 로그인하였습니다." + client);
 
@@ -206,7 +214,7 @@ public class IPServer extends AbstractServer {
 	}
 
 	void newID(String m, ConnectionToClient client) {
-		m = m.substring(3);
+		m = m.substring(6);
 		String[] n = m.split("!");
 		System.out.println("Client로부터 회원가입 요청을 받았습니다." + client);
 		IndianPoker.getInstance().db.newID(n[0], n[1]);

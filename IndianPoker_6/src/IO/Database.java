@@ -58,28 +58,11 @@ public class Database {
 	public void UpdateScore(String id,int score){
 		init();
 		String sql=null;
-		String sql2=null;
 
 		try{
-			sql2="select id from member where id="+"'"+id+"'";//로그인한 회원의 아이디비교
-			pstmt = con.prepareStatement(sql2);
-			rs = pstmt.executeQuery(sql2);
-			rs.next();
-			
-			if(id.equals(rs.getString("id"))){//로그인한 회원이면
-				sql2="select score from member where id="+"'"+id+"'"; //그 회원의 score출력
-				pstmt = con.prepareStatement(sql2);
-				rs = pstmt.executeQuery(sql2); 
-				rs.next();
-				if(score!=rs.getInt("score")){
-					System.out.println("회원 랭킹갱신");
-				}
-			}
-
 			sql="update member set score="+score+" where id="+"'"+id+"'";
 			pstmt = con.prepareStatement(sql);
-
-
+			pstmt.executeUpdate();
 		} catch (Exception e1) {
 			System.out.println(e1.getMessage());
 		} finally {

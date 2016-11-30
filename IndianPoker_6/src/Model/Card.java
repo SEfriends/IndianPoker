@@ -25,7 +25,7 @@ public class Card {
 	}
 	
 	public int selectCard(){
-		int index = (int)(Math.random()*card.size()) + 1; // Vector 카드의 크기범위 내의 난수를 발생시켜 해당 인덱스를 카드값으로 정함
+		int index = (int)(Math.random()*card.size()); // Vector 카드의 크기범위 내의 난수를 발생시켜 해당 인덱스를 카드값으로 정함
 		cardValue = card.get(index);
 		card.remove(index);
 		
